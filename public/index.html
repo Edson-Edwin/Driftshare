@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DriftShare — LAN file transfer</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-name">DRIFTSHARE</span>
+    </div>
+    <div class="me" id="me">
+      <span class="dot dot--live"></span>
+      <span id="meName">connecting…</span>
+      <button id="renameBtn" title="Rename this device">edit</button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <section class="panel devices">
+      <div class="panel-head">
+        <h2>Nearby <span class="muted">/ same network</span></h2>
+        <span class="count" id="peerCount">0</span>
+      </div>
+      <div id="peerList" class="peer-list">
+        <p class="empty-state">Scanning for devices on this Wi-Fi…</p>
+      </div>
+    </section>
+
+    <section class="panel dropzone-panel">
+      <div class="panel-head">
+        <h2>Send</h2>
+        <span class="muted" id="targetLabel">select a device →</span>
+      </div>
+
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-inner">
+          <div class="dz-mark">⇩</div>
+          <p class="dz-title">Drop files here</p>
+          <p class="dz-sub">or</p>
+          <label class="file-btn">
+            choose files
+            <input type="file" id="fileInput" multiple hidden />
+          </label>
+        </div>
+      </div>
+
+      <div class="panel-head transfers-head">
+        <h2>Activity</h2>
+      </div>
+      <div id="transferList" class="transfer-list">
+        <p class="empty-state">No transfers yet. Pick a device, then drop a file.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="offerModal" class="modal hidden">
+    <div class="modal-card">
+      <p class="modal-eyebrow">Incoming</p>
+      <h3 id="offerTitle">file.name</h3>
+      <p id="offerMeta" class="modal-meta">from device · 0 B</p>
+      <div class="modal-actions">
+        <button id="offerReject" class="btn btn--ghost">Decline</button>
+        <button id="offerAccept" class="btn btn--solid">Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="client.js"></script>
+</body>
+</html>
