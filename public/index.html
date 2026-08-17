@@ -8,17 +8,18 @@
 </head>
 <body>
 
-  <div class="scanline" aria-hidden="true"></div>
-
   <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">◆</span>
-      <span class="brand-name">DRIFTSHARE</span>
+    <a class="brand" href="/" aria-label="DriftShare home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-name">DriftShare</span>
+      <span class="brand-tag">LOCAL TRANSFER</span>
+    </a>
+    <div class="connection connection--connecting" id="connectionStatus" role="status" aria-live="polite">
+      <span class="dot"></span><span>Connecting</span>
     </div>
     <div class="me" id="me">
-      <span class="dot dot--live"></span>
       <span id="meName">connecting…</span>
-      <button id="renameBtn" title="Rename this device">edit</button>
+      <button id="renameBtn" title="Rename this device">Rename</button>
     </div>
   </header>
 
@@ -26,25 +27,25 @@
 
     <section class="panel devices">
       <div class="panel-head">
-        <h2>Nearby <span class="muted">/ same network</span></h2>
-        <span class="count" id="peerCount">0</span>
+        <div><p class="eyebrow">Discover</p><h2>Nearby devices</h2></div>
+        <span class="count"><span id="peerCount">0</span> online</span>
       </div>
       <div id="peerList" class="peer-list">
-        <p class="empty-state">Scanning for devices on this Wi-Fi…</p>
+        <p class="empty-state">Looking for devices on your Wi-Fi…</p>
       </div>
     </section>
 
     <section class="panel dropzone-panel">
       <div class="panel-head">
-        <h2>Send</h2>
-        <span class="muted" id="targetLabel">select a device →</span>
+        <div><p class="eyebrow">Transfer</p><h2>Send files</h2></div>
+        <span class="target-label" id="targetLabel">Choose a device</span>
       </div>
 
       <div id="dropzone" class="dropzone">
         <div class="dropzone-inner">
-          <div class="dz-mark">⇩</div>
-          <p class="dz-title">Drop files here</p>
-          <p class="dz-sub">or</p>
+          <div class="dz-mark" aria-hidden="true">↑</div>
+          <p class="dz-title">Drop files to send</p>
+          <p class="dz-sub">or browse from this device</p>
           <label class="file-btn">
             choose files
             <input type="file" id="fileInput" multiple hidden />
@@ -53,7 +54,7 @@
       </div>
 
       <div class="panel-head transfers-head">
-        <h2>Activity</h2>
+        <h2>Recent activity</h2>
       </div>
       <div id="transferList" class="transfer-list">
         <p class="empty-state">No transfers yet. Pick a device, then drop a file.</p>

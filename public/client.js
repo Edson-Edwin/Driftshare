@@ -14,18 +14,14 @@
   const offerModal = $('#offerModal');
   const offerTitle = $('#offerTitle');
   const offerMeta = $('#offerMeta');
+  const connectionStatusEl = $('#connectionStatus');
 
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   const deviceType = isMobile ? 'mobile' : 'desktop';
 
-  function defaultName() {
-    const adjectives = ['Swift', 'Quiet', 'Amber', 'Copper', 'North', 'Lunar', 'Ember', 'Slate'];
-    const noun = isMobile ? 'Phone' : 'Laptop';
-    const a = adjectives[Math.floor(Math.random() * adjectives.length)];
-    return `${a} ${noun}`;
-  }
-
-  let myName = localStorage.getItem('driftshare-name') || defaultName();
+  // Browsers do not expose a person's computer name. A predictable label is
+  // clearer and more trustworthy than inventing a random one.
+  let myName = localStorage.getItem('driftshare-name') || 'This device';
   let myId = null;
   let peers = [];
   let selectedPeerId = null;
@@ -40,25 +36,57 @@
 
   // ---------------- WebSocket ----------------
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  const ws = new WebSocket(`${proto}://${location.host}`);
-  ws.binaryType = 'arraybuffer';
+  let ws;
+  let reconnectTimer;
+  let reconnectAttempt = 0;
+  let hasConnected = false;
 
-  ws.addEventListener('open', () => {
-    send({ type: 'hello', name: myName, deviceType });
-  });
+  function setConnectionStatus(state) {
+    const labels = { connected: 'Connected', connecting: 'Reconnecting', offline: 'Waiting for Wi-Fi' };
+    connectionStatusEl.className = `connection connection--${state}`;
+    connectionStatusEl.querySelector('span:last-child').textContent = labels[state];
+  }
 
-  ws.addEventListener('close', () => {
-    toast('Disconnected from network. Reload to reconnect.', true);
-  });
+  function connect() {
+    clearTimeout(reconnectTimer);
+    setConnectionStatus('connecting');
+    ws = new WebSocket(`${proto}://${location.host}`);
+    ws.binaryType = 'arraybuffer';
+    ws.addEventListener('open', () => {
+      const wasReconnecting = hasConnected;
+      hasConnected = true;
+      reconnectAttempt = 0;
+      setConnectionStatus('connected');
+      send({ type: 'hello', name: myName, deviceType });
+      if (wasReconnecting) toast('Back on the local network.');
+    });
+    ws.addEventListener('close', () => {
+      peers = [];
+      selectedPeerId = null;
+      renderPeers();
+      targetLabelEl.textContent = 'Choose a device';
+      setConnectionStatus(navigator.onLine ? 'connecting' : 'offline');
+      scheduleReconnect();
+    });
+    ws.addEventListener('error', () => ws.close());
+    ws.addEventListener('message', (event) => {
+      if (typeof event.data !== 'string') return handleBinaryChunk(event.data);
+      try { handleMessage(JSON.parse(event.data)); } catch { /* ignore malformed messages */ }
+    });
+  }
 
-  ws.addEventListener('message', (event) => {
-    if (typeof event.data !== 'string') {
-      handleBinaryChunk(event.data);
-      return;
-    }
-    const msg = JSON.parse(event.data);
-    handleMessage(msg);
+  function scheduleReconnect() {
+    clearTimeout(reconnectTimer);
+    const delay = Math.min(1000 * 2 ** reconnectAttempt, 10000);
+    reconnectAttempt += 1;
+    reconnectTimer = setTimeout(connect, delay);
+  }
+
+  window.addEventListener('online', () => {
+    if (!ws || ws.readyState === WebSocket.CLOSED) connect();
   });
+  window.addEventListener('offline', () => setConnectionStatus('offline'));
+  connect();
 
   function send(obj) {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
@@ -117,7 +145,7 @@
         <div class="peer-icon">${p.deviceType === 'mobile' ? '📱' : '💻'}</div>
         <div class="peer-info">
           <div class="peer-name">${escapeHtml(p.name)}</div>
-          <div class="peer-sub">${p.id}</div>
+          <div class="peer-sub">${p.deviceType === 'mobile' ? 'Phone or tablet' : 'Computer'} · ${p.id}</div>
         </div>
         <span class="peer-badge">target</span>
       `;
@@ -130,7 +158,7 @@
     selectedPeerId = id;
     renderPeers();
     const p = peers.find((x) => x.id === id);
-    targetLabelEl.textContent = p ? `sending to ${p.name}` : 'select a device →';
+    targetLabelEl.textContent = p ? `Sending to ${p.name}` : 'Choose a device';
   }
 
   // ---------------- Rename ----------------

@@ -47,6 +47,7 @@ wss.on('connection', (ws) => {
 
   ws.on('pong', () => {
     ws.isAlive = true;
+    ws.missedHeartbeat = false;
   });
 
   ws.on('message', (data, isBinary) => {
@@ -155,17 +156,22 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Drop dead connections so the peer list stays accurate.
+// Keep backgrounded devices connected; only prune after two missed heartbeats.
 const heartbeat = setInterval(() => {
   for (const ws of wss.clients) {
     if (ws.isAlive === false) {
-      ws.terminate();
+      if (ws.missedHeartbeat) ws.terminate();
+      else {
+        ws.missedHeartbeat = true;
+        ws.ping();
+      }
       continue;
     }
     ws.isAlive = false;
+    ws.missedHeartbeat = false;
     ws.ping();
   }
-}, 15000);
+}, 30000);
 
 wss.on('close', () => clearInterval(heartbeat));
 
