@@ -1,19 +1,41 @@
-# DriftShare
+<p align="center">
+  <img src="docs/assets/driftshare-banner.svg" alt="DriftShare — Your files. Your network. Local file sharing through a browser." width="100%" />
+</p>
 
-**Share files across devices on your local network, straight from a browser.**
+<p align="center">
+  <strong>5 GB files &nbsp; · &nbsp; Multiple recipients &nbsp; · &nbsp; No cloud account</strong>
+</p>
 
-DriftShare runs on one Node.js host. Other devices join its local address, enter a
-four-digit code, and accept files in their browsers. It supports files up to
-**5 GB**, multiple recipients, folder archives, and resumable LAN-host downloads.
-After installation, sharing works without an internet connection or cloud account.
+<p align="center">
+  <a href="#get-started">Get started</a> &nbsp; / &nbsp;
+  <a href="docs/README.md">Documentation</a> &nbsp; / &nbsp;
+  <a href="CONTRIBUTING.md">Contribute</a> &nbsp; / &nbsp;
+  <a href="LICENSE">MIT license</a>
+</p>
 
-[Get started](docs/getting-started.md) · [User guide](docs/usage.md) ·
-[Documentation](docs/README.md) · [Contribute](CONTRIBUTING.md) · [MIT license](LICENSE)
+DriftShare moves files between devices on your local network using their browsers.
+Run it on one computer, open its link on your other devices, and choose who gets a copy.
+Once installed, it works without internet access.
 
-## Quick start
+Send a file to your other computer, share a folder with your team, or deliver the same
+batch to several devices. Each recipient gets their own acceptance prompt and progress.
 
-Install **Node.js 22 or newer** and Git on the computer that will host DriftShare.
-Then run these commands in Terminal or PowerShell:
+![DriftShare interface showing selected recipients and two completed file deliveries](docs/assets/driftshare-preview.png)
+
+<sub>Actual interface after a transfer between local browser sessions. Device labels are illustrative.</sub>
+
+## Built for sharing nearby
+
+- **Bring your browser.** Receiving devices need no app or account. One computer runs the host.
+- **Send up to 5 GB per file.** Large files stream to a native writer or browser Downloads.
+- **Share with a group.** Up to four outgoing recipient deliveries at once, with separate acceptance, cancellation, and retry.
+- **Send folders together.** Bundle folders or selected files into one ZIP and one acceptance per recipient.
+- **Recover interrupted downloads.** Eligible LAN-host downloads can resume within 15 minutes while the original tabs and host remain open.
+- **Keep the infrastructure local.** The UI, joining, signaling, and optional relay run on your host.
+
+## Get started
+
+Install **Node.js 22+** and Git on the host computer, then run:
 
 ```sh
 git clone https://github.com/Edson-Edwin/Driftshare.git
@@ -22,88 +44,80 @@ npm ci
 npm start
 ```
 
-1. Connect your devices to the same local network.
-2. Open a **private join link printed in the host terminal** on each device. You can
-   also open the host address and enter the four-digit code.
-3. Select one or more devices, then choose or drop files.
-4. Accept on each receiving device. Keep the host and both browser tabs running.
+**Join → Choose → Accept.** Open a private link printed in the terminal on each device.
+Select the receiving devices, choose your files, and accept on each receiver.
 
-The default HTTP port is `4000`. A phone must open the host's LAN address, such as
-`http://192.168.1.8:4000`, not `localhost`. The example IP is only illustrative;
-use the address printed by your host.
+All devices must be able to reach the host on the local network. Use the host's printed
+LAN address on a phone, not `localhost`. Keep the host and browser tabs running.
+Dependencies must be installed before you go offline.
 
-HTTP is suitable only for a trusted LAN: it does not encrypt the page, signaling,
-or relayed file bytes. For fully offline HTTPS, install OpenSSL on the host and run:
+**Want encrypted page access and relayed transfers?** With OpenSSL installed on the host:
 
 ```sh
 npm run start:secure
 ```
 
-This creates a local certificate authority and serves HTTPS on port `4443`.
-Each device must trust the public root certificate once. Follow the
-[offline HTTPS guide](docs/security.md) before sharing sensitive files.
+The offline HTTPS launcher uses port `4443` and creates a local certificate authority.
+Each device must trust its public certificate once. The regular `npm start` uses HTTP
+on port `4000`; use that only on a trusted LAN.
+[Follow the setup guide →](docs/getting-started.md)
 
-## Features
+## How files travel
 
-| Feature | What it does |
+**Direct:** Browser → browser over encrypted WebRTC, with receiver flow control and
+integrity checks. Supported browsers can save directly to disk.
+
+**Via LAN host:** Browser → your host → browser Downloads. This makes large downloads
+available when direct saving is unavailable. The host streams the bytes without storing
+a payload file, but it can read them; use HTTPS to encrypt these network connections.
+
+The recipient sees the chosen route before accepting.
+[Explore the architecture →](docs/architecture.md)
+
+## Across your devices
+
+DriftShare targets modern browsers on **Windows, macOS, Linux, Android, iOS, and iPadOS**.
+Only the host needs Node.js. Features such as direct disk saving and download resume
+vary by browser; native Downloads is the large-file fallback.
+
+Automated checks cover Chromium, Firefox, and Playwright WebKit. Physical-device
+qualification is still in progress, especially mobile 5 GB downloads and resume.
+[View compatibility and testing →](docs/testing.md)
+
+<details>
+<summary><strong>Before a large transfer</strong></summary>
+
+- The limit is **5,000,000,000 bytes per file**, about 4.66 GiB. The 128 MiB in-memory
+  budget applies to retained small files, not the maximum transfer size.
+- Folders support up to 1,000 files within the 5 GB archive limit. ZIP preparation reads
+  the files first; empty directories are omitted.
+- Keep phones awake and the page visible. Background transfers are not guaranteed.
+- **Sent to browser Downloads** is not confirmation of a disk save. Check Downloads.
+  For small files retained in the tab, click **save file** before clearing the card.
+- WebRTC retry starts from zero. Relay resume requires the original tabs and host;
+  it cannot recover after a source reload, host restart, expiry, or completed session.
+- Group delivery sends separate copies that share bandwidth. Actual speed depends on
+  your network and storage; there is no guaranteed throughput.
+- Trust the host and keep join links private. This is a LAN tool, not a public file server.
+
+[Full user guide](docs/usage.md) · [Security and privacy](docs/security.md)
+
+</details>
+
+## Find your next step
+
+| Using DriftShare | Building DriftShare |
 | --- | --- |
-| Large files | Up to 5,000,000,000 bytes per file; streams large downloads instead of retaining the entire payload in JavaScript memory |
-| Group sharing | Up to four outgoing recipient deliveries at once, with individual acceptance, progress, cancellation, and retry |
-| Folders and batches | Creates an uncompressed ZIP/ZIP64 archive for one acceptance per recipient |
-| Two transfer routes | Direct encrypted WebRTC, or a live stream through the LAN host into browser Downloads |
-| Interrupted downloads | LAN-host downloads can resume within 15 minutes when the browser supports it and the original tabs remain open |
-| Local joining | Four-digit code, private links, and optional locally generated QR codes |
-| Offline operation | No cloud signaling, external fonts, external QR service, STUN, or TURN service configured by the app |
-| Delivery records | Per-device totals and a JSON results export |
+| [Setup and first transfer](docs/getting-started.md) | [Architecture and protocol](docs/architecture.md) |
+| [Files, folders, groups, and resume](docs/usage.md) | [Development and contributions](CONTRIBUTING.md) |
+| [Configuration and offline HTTPS](docs/configuration.md) | [Tests and platform qualification](docs/testing.md) |
+| [Troubleshooting and FAQ](docs/troubleshooting.md) | [Benchmarks and measurement](docs/benchmarking.md) |
+| [Security and privacy](docs/security.md) | [Changelog](CHANGELOG.md) · [Roadmap](docs/roadmap.md) |
 
-## Which devices can use it?
+## Make it better
 
-The client targets modern browsers on **Windows, macOS, Linux, Android, iOS, and
-iPadOS**. Only the host computer needs Node.js. Receive options depend on browser
-capabilities: direct disk saving requires a supported secure-context API; native
-browser Downloads provides the large-file fallback.
-
-This is a compatibility target, not a claim that every device/browser combination
-has passed testing. Chromium, Firefox, and Playwright WebKit have automated tests;
-Playwright WebKit is not physical iOS Safari. See the
-[compatibility matrix and device checklist](docs/testing.md).
-
-## Important limits
-
-- **5 GB is decimal**, approximately 4.66 GiB. The 128 MiB limit shown for memory is
-  a shared budget for small received files, not the maximum transfer size.
-- Group sharing sends a separate copy to each recipient; all copies share bandwidth.
-- Folders allow up to 1,000 files and a 5 GB archive including metadata. Empty
-  directories are omitted, and ZIP preparation reads the source files once first.
-- WebRTC retries restart from zero. Relay resume does not survive a source-tab reload,
-  a host restart, expiry, or a completed relay session.
-- **Sent to browser Downloads** means the host delivered the bytes to the download
-  response. Check the browser's Downloads manager for the actual save result.
-- Keep phones awake and the app visible. Background and locked-screen transfers
-  are not guaranteed.
-- This is a trusted-LAN tool, not an internet-facing file hosting service. The host
-  remains part of the trust boundary, including when the payload uses WebRTC.
-
-## Documentation
-
-| I want to… | Read |
-| --- | --- |
-| Install, join, update, or prepare an offline host | [Getting started](docs/getting-started.md) |
-| Send files, folders, groups, and resume a download | [User guide](docs/usage.md) |
-| Set ports, interfaces, certificates, or a reverse proxy | [Configuration and hosting](docs/configuration.md) |
-| Understand encryption, privacy, and certificate trust | [Security and privacy](docs/security.md) |
-| Fix connection, speed, saving, or certificate problems | [Troubleshooting and FAQ](docs/troubleshooting.md) |
-| Understand the code and transfer protocol | [Architecture](docs/architecture.md) |
-| Run tests or qualify a real device | [Testing](docs/testing.md) |
-| Measure speed and compare applications fairly | [Benchmarking](docs/benchmarking.md) |
-| Report a bug or submit a pull request | [Contributing](CONTRIBUTING.md) |
-| Report a security concern | [Security policy](SECURITY.md) |
-| See changes and remaining work | [Changelog](CHANGELOG.md) and [roadmap](docs/roadmap.md) |
-
-## Development
-
-There is no frontend build step or database. The server uses Node.js, Express, and
-`ws`; the client uses plain JavaScript, HTML, and CSS.
+Help test a device, improve accessibility, fix a bug, or clarify a guide. The code uses
+**Node.js, Express, WebRTC, and plain JavaScript**—there is no frontend build step or database.
 
 ```sh
 npm ci
@@ -111,13 +125,11 @@ npm run check
 npm test
 ```
 
-For browser tests, install the required Playwright browsers first. See
-[Testing](docs/testing.md) for commands, system dependencies, and test limitations.
-The [contribution guide](CONTRIBUTING.md) explains the review workflow.
+Read [Contributing](CONTRIBUTING.md) before your first pull request.
+[Report a bug](https://github.com/Edson-Edwin/Driftshare/issues/new?template=bug_report.yml),
+[suggest a feature](https://github.com/Edson-Edwin/Driftshare/issues/new?template=feature_request.yml),
+or follow the [security policy](SECURITY.md) for vulnerability reports.
 
-## License and dependencies
+---
 
-DriftShare is distributed under the [MIT license](LICENSE). Third-party packages
-retain their own licenses. The repository historically tracked `node_modules`;
-`package-lock.json` and `npm ci` are the dependency installation source of truth.
-See [Contributing](CONTRIBUTING.md) before changing dependency files.
+[MIT licensed](LICENSE). Built for local sharing. Third-party dependencies retain their own licenses.
