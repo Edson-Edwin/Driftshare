@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Setup and troubleshooting
+    url: https://github.com/Edson-Edwin/Driftshare/blob/main/docs/troubleshooting.md
+    about: Check connection, download, certificate, and speed guidance first.
+  - name: Security reporting policy
+    url: https://github.com/Edson-Edwin/Driftshare/blob/main/SECURITY.md
+    about: Follow the private-reporting guidance; do not publish vulnerability details in a bug report.

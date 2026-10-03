@@ -1,0 +1,28 @@
+name: Feature request
+description: Propose an improvement to offline LAN sharing.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the user and workflow affected, rather than only naming a technology.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Proposed behavior
+      description: Explain how someone would use it and how success could be verified.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Offline and cross-platform considerations
+      description: Which devices need it? Would it require internet access, an installed app, new trust, or persistent file storage?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and evidence
+      description: Describe workarounds, related issues, or measured results. Do not include invented benchmarks.

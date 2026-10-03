@@ -1,0 +1,67 @@
+name: Bug report
+description: Report a reproducible problem with DriftShare.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For vulnerabilities, follow SECURITY.md instead of posting details here.
+        Remove join codes, private links, transfer tokens, private keys, and personal filenames from attachments.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe actual behavior and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal sequence using non-sensitive test files.
+      placeholder: |
+        1. Start the host with...
+        2. Join from...
+        3. Select a file and receive it using...
+        4. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Versions and devices
+      description: Include git rev-parse HEAD, host OS and Node version, and sender/receiver OS and browser versions.
+    validations:
+      required: true
+  - type: dropdown
+    id: route
+    attributes:
+      label: Transfer route
+      options:
+        - Direct WebRTC
+        - Via LAN host
+        - No transfer started
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: transfer
+    attributes:
+      label: Transfer and network details
+      description: File size in bytes, file or folder, recipient count, HTTP/HTTPS, Wi-Fi/Ethernet, and whether the host is a separate device. Does a small file or the other route work?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Include the exact error and relevant console output. Review exported results before attaching them.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked the troubleshooting guide and searched existing issues.
+          required: true
+        - label: I removed credentials, private keys, and sensitive files from this report.
+          required: true
