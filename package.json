@@ -1,14 +1,28 @@
 {
   "name": "driftshare",
   "version": "1.0.0",
-  "description": "Fast LAN file sharing over WebSocket — AirDrop-style, no internet required.",
+  "description": "Private browser-to-browser LAN file transfers over WebRTC",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test test/*.test.cjs",
+    "check": "node --check server.js && node --check relay.js && node --check public/client.js && node --check public/protocol.js && node --check public/archive.js",
+    "test:browser": "node test/browser.cjs",
+    "test:large": "node test/large.cjs",
+    "test:compatibility": "node test/compatibility.cjs",
+    "test:resume": "node test/resume-browser.cjs",
+    "test:archive-large": "node test/archive-large.cjs"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "ws": "^8.18.0"
+    "express": "^4.22.3",
+    "ws": "^8.21.3",
+    "content-disposition": "^0.5.4"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

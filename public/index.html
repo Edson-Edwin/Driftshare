@@ -19,7 +19,9 @@
     </div>
     <div class="me" id="me">
       <span id="meName">connecting…</span>
+      <button id="joinBtn" title="Show a QR code to open DriftShare on another device">Join</button>
       <button id="renameBtn" title="Rename this device">Rename</button>
+      <button id="reconnectBtn" title="Reconnect to the host">Reconnect</button>
     </div>
   </header>
 
@@ -30,6 +32,7 @@
         <div><p class="eyebrow">Discover</p><h2>Nearby devices</h2></div>
         <span class="count"><span id="peerCount">0</span> online</span>
       </div>
+      <p class="queue-status">Select one or more devices. Tap again to deselect.</p>
       <div id="peerList" class="peer-list">
         <p class="empty-state">Looking for devices on your Wi-Fi…</p>
       </div>
@@ -38,36 +41,47 @@
     <section class="panel dropzone-panel">
       <div class="panel-head">
         <div><p class="eyebrow">Transfer</p><h2>Send files</h2></div>
-        <span class="target-label" id="targetLabel">Choose a device</span>
+        <span class="target-label" id="targetLabel">Choose devices</span>
       </div>
 
-      <div id="dropzone" class="dropzone">
+      <div id="dropzone" class="dropzone" tabindex="0" aria-label="File transfer area. Drop files, choose files, or paste copied files.">
         <div class="dropzone-inner">
           <div class="dz-mark" aria-hidden="true">↑</div>
           <p class="dz-title">Drop files to send</p>
-          <p class="dz-sub">or browse from this device</p>
-          <label class="file-btn">
-            choose files
-            <input type="file" id="fileInput" multiple hidden />
-          </label>
+          <p class="dz-sub">Up to 5 GB per file · Send to up to 4 devices at once</p>
+          <button type="button" id="chooseFiles" class="file-btn">choose files</button>
+          <button type="button" id="chooseFolder" class="file-btn">choose folder</button>
+          <input type="file" id="fileInput" multiple hidden />
+          <input type="file" id="folderInput" webkitdirectory multiple hidden />
+          <label class="save-option"><input type="checkbox" id="bundleFiles" /> Bundle selected files into one ZIP / one acceptance</label>
+          <p id="prepareStatus" class="storage-note" role="status"></p>
+          <button id="cancelPrepare" class="link-btn" hidden>Cancel preparation</button>
         </div>
       </div>
 
       <div class="panel-head transfers-head">
         <h2>Recent activity</h2>
+        <button type="button" id="exportResults" class="link-btn">Export results</button>
+        <button type="button" id="clearCompleted" class="link-btn">Clear finished</button>
       </div>
+      <p id="queueStatus" class="queue-status" role="status">0/4 outgoing active · 0 queued · 0 B in memory</p>
+      <p id="deliverySummary" class="queue-status" role="status"></p>
+      <p id="activityNote" class="queue-status" role="status">Works through a modern browser. Keep both devices on the same network.</p>
       <div id="transferList" class="transfer-list">
-        <p class="empty-state">No transfers yet. Pick a device, then drop a file.</p>
+        <p class="empty-state">No transfers yet. Select devices, then drop a file.</p>
       </div>
     </section>
 
   </main>
 
-  <div id="offerModal" class="modal hidden">
+  <div id="offerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="offerTitle" aria-describedby="offerMeta storageNote">
     <div class="modal-card">
       <p class="modal-eyebrow">Incoming</p>
       <h3 id="offerTitle">file.name</h3>
       <p id="offerMeta" class="modal-meta">from device · 0 B</p>
+      <label class="save-option"><input type="checkbox" id="saveDirectly" /> Save directly to disk</label>
+      <label class="save-option"><input type="checkbox" id="useRelay" /> Use browser Downloads via LAN host</label>
+      <p id="storageNote" class="storage-note"></p>
       <div class="modal-actions">
         <button id="offerReject" class="btn btn--ghost">Decline</button>
         <button id="offerAccept" class="btn btn--solid">Accept</button>
@@ -75,8 +89,34 @@
     </div>
   </div>
 
-  <div id="toasts" class="toasts"></div>
+  <div id="joinModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
+    <div class="modal-card join-card">
+      <p class="modal-eyebrow">Join this network</p>
+      <h3 id="joinTitle">Scan to open DriftShare</h3>
+      <p>Join code: <strong id="joinCode"></strong></p>
+      <label for="joinAddress">Network address</label>
+      <select id="joinAddress"></select>
+      <img id="joinQr" class="join-qr" alt="QR code for this DriftShare address" />
+      <p id="qrNote" class="storage-note"></p>
+      <p id="joinUrl" class="modal-meta"></p>
+      <div class="modal-actions"><button id="copyJoin" class="btn">Copy link</button><button id="joinClose" class="btn btn--solid">Done</button></div>
+    </div>
+  </div>
 
+  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <form id="authForm" class="modal-card">
+      <h3 id="authTitle">Join this DriftShare</h3>
+      <p class="modal-meta">Enter the 4-digit code shown in the host’s terminal or Join panel.</p>
+      <label for="accessCode">4-digit join code</label>
+      <input id="accessCode" type="text" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" required autocomplete="one-time-code" spellcheck="false" placeholder="1234" />
+      <div class="modal-actions"><button class="btn btn--solid" type="submit">Join</button></div>
+    </form>
+  </div>
+
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+
+  <script src="protocol.js"></script>
+  <script src="archive.js"></script>
   <script src="client.js"></script>
 </body>
 </html>

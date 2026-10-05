@@ -1,0 +1,7 @@
+node_modules/
+playwright-report/
+test-results/
+*.pem
+*.key
+.env
+.driftshare-tls/
