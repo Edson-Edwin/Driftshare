@@ -7,13 +7,13 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --test test/*.test.cjs",
-    "check": "node --check server.js && node --check relay.js && node --check public/client.js && node --check public/protocol.js && node --check public/archive.js && node --check scripts/offline-https.cjs",
+    "check": "node --check server.js && node --check relay.js && node --check public/client.js && node --check public/protocol.js && node --check public/archive.js && node --check scripts/offline-https.cjs && node --check scripts/benchmark.cjs",
     "test:browser": "node test/browser.cjs",
     "test:large": "node test/large.cjs",
     "test:compatibility": "node test/compatibility.cjs",
+    "start:secure": "node scripts/offline-https.cjs",
     "test:resume": "node test/resume-browser.cjs",
-    "test:archive-large": "node test/archive-large.cjs",
-    "start:secure": "node scripts/offline-https.cjs"
+    "test:archive-large": "node test/archive-large.cjs"
   },
   "dependencies": {
     "express": "^4.22.3",
